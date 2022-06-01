@@ -24,12 +24,55 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-  String num = "";
+  String text = "";
+  double num1 = 0;
+
+  String opr = '+';
+  double result = 0;
 
   void changeNum(String btntxt) {
     setState(() {
-      num += btntxt;
+      if (btntxt == 'AC') {
+        text = "";
+        num1 = 0;
+        result = 0;
+        opr = '+';
+      } else if ('+-x/%'.contains(btntxt)) {
+        calculate();
+        text = '';
+        opr = btntxt;
+      } else if (btntxt == '=') {
+        calculate();
+        opr = '+';
+        num1 = 0;
+        text = result.toStringAsFixed(5);
+        result = 0;
+      } else {
+        text += btntxt;
+      }
     });
+  }
+
+  void calculate() {
+    num1 = double.tryParse(text) ?? 0;
+    switch (opr) {
+      case '+':
+        result += num1;
+        break;
+      case '-':
+        result -= num1;
+        break;
+      case '/':
+        result /= num1;
+        break;
+      case 'x':
+        result *= num1;
+        break;
+      case '%':
+        result *= num1;
+        result /= 100;
+        break;
+    }
   }
 
   ElevatedButton button(String btntxt, Color btncolor) {
@@ -60,17 +103,17 @@ class _CalculatorState extends State<Calculator> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                num,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 100,
-                ),
+          Container(
+            width: double.infinity,
+            alignment: Alignment.centerRight,
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 70,
               ),
-            ],
+              textAlign: TextAlign.left,
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -79,7 +122,7 @@ class _CalculatorState extends State<Calculator> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    num = num.substring(0, num.length - 1);
+                    text = text.substring(0, text.length - 1);
                   });
                 },
                 style: ElevatedButton.styleFrom(
@@ -101,7 +144,7 @@ class _CalculatorState extends State<Calculator> {
               button("7", Colors.black),
               button("8", Colors.black),
               button("9", Colors.black),
-              button("X", const Color.fromARGB(255, 59, 58, 58)),
+              button("x", const Color.fromARGB(255, 59, 58, 58)),
             ],
           ),
           Row(
@@ -126,7 +169,9 @@ class _CalculatorState extends State<Calculator> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  changeNum('0');
+                },
                 style: ElevatedButton.styleFrom(
                   shape: const StadiumBorder(),
                   primary: Colors.black,
